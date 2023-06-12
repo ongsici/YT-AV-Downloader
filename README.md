@@ -3,7 +3,8 @@
 This technique makes use of [yt-dlp](https://github.com/yt-dlp/yt-dlp). 
 
 ### Installation
-<code>conda create -n ytdownloader python=3.8 -y 
+<code>git clone https://github.com/ongsici/YT-AV-Downloader.git
+conda create -n ytdownloader python=3.8 -y 
 conda activate ytdownloader 
 pip install -r requirements.txt </code>
 
