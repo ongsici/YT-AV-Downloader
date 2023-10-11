@@ -5,7 +5,7 @@ import datetime
 import ffmpeg
 import os
 import argparse
-
+from pytube import YouTube
 
 def arguments():
     parser = argparse.ArgumentParser()
@@ -32,33 +32,42 @@ def main():
         start_int = int(datetime.timedelta(hours=int(start_h),minutes=int(start_m),seconds=int(start_s)).total_seconds())
         end_int = int(datetime.timedelta(hours=int(end_h),minutes=int(end_m),seconds=int(end_s)).total_seconds())
 
-        if args.task_option == 'video':
-            filename = f'Youtube_Video/{args.output_name}/{args.output_name}_{count_str}.{args.video_ext}'
-            ydl_opts = {
-                'format': f'bestvideo[ext={args.video_ext}]+bestaudio[ext={args.audio_ext}]/best[ext={args.video_ext}]/best',
-                'download_ranges': download_range_func(None, [(start_int, end_int)]),
-                'force_keyframes_at_cuts': True, 
-                'outtmpl': filename,
-            }
-            
-        elif args.task_option == 'audio':
-            filename=f'Youtube_Audio/{args.output_name}/{args.output_name}_{count_str}.{args.audio_ext}'
+        # check if YouTube video exists
+        yt = YouTube(url)
+        try:
+            yt.check_availability()
 
-            ydl_opts = {
-            'format': f'bestaudio[ext={args.audio_ext}]/best',
-            'download_ranges': download_range_func(None, [(start_int, end_int)]),
-            # for yt links
-            'force_keyframes_at_cuts': True, 
-            'outtmpl': f'Youtube_Audio/{args.output_name}/{args.output_name}_{count_str}',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'wav',
-            }],
-            }
-        
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            if os.path.isfile(filename) is False:
-                ydl.download([url])
+            if args.task_option == 'video':
+                filename = f'Youtube_Video/{args.output_name}/{args.output_name}_{count_str}.{args.video_ext}'
+                ydl_opts = {
+                    'format': f'bestvideo[ext={args.video_ext}]+bestaudio[ext={args.audio_ext}]/best[ext={args.video_ext}]/best',
+                    'download_ranges': download_range_func(None, [(start_int, end_int)]),
+                    'force_keyframes_at_cuts': True, 
+                    'outtmpl': filename,
+                }
+                
+            elif args.task_option == 'audio':
+                filename=f'Youtube_Audio/{args.output_name}/{args.output_name}_{count_str}.{args.audio_ext}'
+
+                ydl_opts = {
+                'format': f'bestaudio[ext={args.audio_ext}]/best',
+                'download_ranges': download_range_func(None, [(start_int, end_int)]),
+                # for yt links
+                'force_keyframes_at_cuts': True, 
+                'outtmpl': f'Youtube_Audio/{args.output_name}/{args.output_name}_{count_str}',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'wav',
+                }],
+                }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                if os.path.isfile(filename) is False:
+                    ydl.download([url])
+
+        except Exception as e:
+            print(e)
+            pass
 
 if __name__ == "__main__":
     main()
